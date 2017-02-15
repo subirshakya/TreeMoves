@@ -2,8 +2,8 @@
 #!/usr/bin/env python
 
 from __future__ import (division, print_function)
-import random
-
+from scipy.linalg import expm
+import numpy
 
 
 """pass a node to node. Node("root")"""
@@ -132,3 +132,51 @@ class Tree:
 			else:
 				newick += ")"
 			return newick
+---------
+import random
+bigD="(A:3,((B:1,C:1):1,D:2):1)"
+Sim = Tree(bigD)
+
+-----pick node to start------
+invTL = Sim.inverseTreeLength(Sim.root)
+goal = random.uniform(0,invTL)
+
+
+----NNI moves-----
+loop = "true"
+while loop == "true":
+	#start with root
+	c1=Sim.root
+	#find a terminal node (randomly) and assign to c1
+	while c1.children !=[]:
+		c1 = where_my_child(c1)[random.choice([0,1])]
+	#print c1.name
+	#for both childrens of the parent of c1, assign name to c2
+	for c in c1.parent.children:
+		if c != c1:
+			c2 =c
+	br1, br2 = c1.brl, c2.brl
+	#only works if c2 has grand children. Can't NNI on sister taxa only.
+	if c2.children != []:
+		gc1, gc2 = where_my_child(c2)	
+		br3, br4 = gc1.brl, gc2.brl
+		loop = "false"
+		
+p = c1.parent
+#remove all children
+p.children = []
+#this is the node to attach grandchildren to
+new_node = Node("new",parent=p)
+#give it same br as before
+new_node.brl = br2
+#append one of the two grandchildren to p. append other one to new node
+adopt=random.choice([1,2])
+if adopt == 1:
+	p.children.append(gc1)
+	new_node.children.append(gc2)
+elif adopt ==2:
+	p.children.append(gc2)
+	new_node.children.append(gc1)
+p.children.append(new_node)
+#add c1 to new node
+new_node.children.append(c1)
