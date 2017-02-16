@@ -132,3 +132,5 @@ class Tree:
 			else:
 				newick += ")"
 			return newick
+
+	
