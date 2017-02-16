@@ -77,17 +77,17 @@ class Tree:
 			for child in node.children:
 				self.printNames(child)
 
-	def printTermNodes(self,node):
+	def printTermNodes(self,node,terminal_nodes=[]):
 		"""
 		A method of a Tree object that will print out the node instances for all tips in a list. 
 		"""
-		terminal_nodes=[]
 		if node.children == []: #Identifies terminal node
-			print node.name
+			print(node.name)
 			terminal_nodes.append(node)
 		else:
 			for child in node.children:
-				self.printTermNodes(child)
+				print(terminal_nodes)
+				self.printTermNodes(child,terminal_nodes)
 		return terminal_nodes
 
 	def treeLength(self,node):
