@@ -77,6 +77,18 @@ class Tree:
 			for child in node.children:
 				self.printNames(child)
 
+	def printTermNodes(self,node):
+		"""
+		A method of a Tree object that will print out the node instances for all tips in a list. 
+		"""
+		terminal_nodes=[]
+		if node.children == []: #Identifies terminal node
+			terminal_nodes.append(node)
+		else:
+			for child in node.children:
+				self.printTermNodes(child)
+		return terminal_nodes
+
 	def treeLength(self,node):
 		"""
 		A method to calculate and return total tree length.
@@ -150,27 +162,45 @@ Sim = Tree(bigD)
 
 -----pick node to start------
 
-
-def traverse_nodes(node,goal):
+def edge_length(tip):
 	if node.brl == 0:
-		print("br len is zero")
-		return 56
+		return node.brl
 	else:
 		#get inverse of branch length
 		inv_br=1/float(node.brl)
 		#subtract from goal
 		goal -= inv_br
-		print("new goal:"+str(goal))
+		#print("new goal:"+str(goal))
 		#if goal is less than zero, return p as node you will start NNI with. 
 		if goal <= 0:
 			start = node
-			print("start: "+str(start.name))
+			#print("start: "+str(start.name))
 			return start
 		#if goal is still above 0, go to parent node and run program again
 		elif goal > 0:
 			p = node.parent
-			print("new parent: "+str(p.name))
-			traverse_nodes(p,goal)
+			#print("new parent: "+str(p.name))
+			return traverse_nodes(p,goal)
+
+def traverse_nodes(node,goal):
+	if node.brl == 0:
+		return node.brl
+	else:
+		#get inverse of branch length
+		inv_br=1/float(node.brl)
+		#subtract from goal
+		goal -= inv_br
+		#print("new goal:"+str(goal))
+		#if goal is less than zero, return p as node you will start NNI with. 
+		if goal <= 0:
+			start = node
+			#print("start: "+str(start.name))
+			return start
+		#if goal is still above 0, go to parent node and run program again
+		elif goal > 0:
+			p = node.parent
+			#print("new parent: "+str(p.name))
+			return traverse_nodes(p,goal)
 
 
 def pick_start(tree):
@@ -178,17 +208,18 @@ def pick_start(tree):
 	n=Sim.root
 	#calculate total inverse tree length
 	invTL = Sim.inverseTreeLength(n)
-	print("inv_TL = "+str(invTL))
+	#print("inv_TL = "+str(invTL))
 	#calculate goal, random number between 0 and invTL to use for picking a random node to do NNI move on. 
 	g = random.uniform(0,invTL)
-	print("OG goal = "+str(g))
+	#print("OG goal = "+str(g))
 	#find a terminal node (randomly) and assign to n
 	while n.children !=[]:
 		n = where_my_child(n)[random.choice([0,1])]
-	print("first node: "+str(n.name))
+	#print("first node: "+str(n.name))
 	#find a node based on the goal
 	c1 = traverse_nodes(n,g)
-	print("first c1: "+str(c1))
+	#print("first c1: "+str(c1))
+	#print(type(c1))
 	#if you get to the root and return false
 	while c1 == 0:
 		#rerun terminal node choice and traversing tree
@@ -198,12 +229,12 @@ def pick_start(tree):
 		print("false loop node: "+str(n.name))
 		c1=traverse_nodes(n,g)
 	p = c1
-	print("p: "+str(p.name))
+	#print("p: "+str(p.name))
 	return p
 
-pick_start(Sim)
+x = pick_start(Sim)
 
------test-------
+-----older_tests-------------------------------------------------
 n=Sim.root
 #calculate total inverse tree length
 invTL = Sim.inverseTreeLength(n)
