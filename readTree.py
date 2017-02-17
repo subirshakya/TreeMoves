@@ -34,9 +34,9 @@ class Tree:
 		"""variable stores object called root that is classified as a node"""
 		self.root = Node("root") #Define root
 		"""Initiate with self.root as base. First step is initiating data with root as parent of ALL"""
-		self.newicksplicer(data, self.root)
+		self.newick_splicer(data, self.root)
 
-	def newicksplicer(self, data, parent):
+	def newick_splicer(self, data, parent):
 		"""
 		Splices newick data to create a node based tree.
 		"""
@@ -57,15 +57,15 @@ class Tree:
 								node_creater = Node(d, parent = parent) #Create node entry
 								node_creater.brl = float(unit[unit.rfind(":")+1:]) #Append branch length of that branch
 								parent.children.append(node_creater) #Create children. Hello parent, your children are ...
-								self.newicksplicer(d, node_creater) #Recursive function
+								self.newick_splicer(d, node_creater) #Recursive function
 							else: #For case with no branch lengths
 								d=unit
 								node_creater = Node(d, parent = parent)
 								parent.children.append(node_creater)
-								self.newicksplicer(d, node_creater)
+								self.newick_splicer(d, node_creater)
 						break #Terminate loop, we don't need to look any further
 
-	def printNames(self,node):
+	def print_names(self,node):
 		"""
 		A method of a Tree object that will print out the names of its
 		terminal nodes.
@@ -75,9 +75,9 @@ class Tree:
 			print (node.name)
 		else:
 			for child in node.children:
-				self.printNames(child)
+				self.print_names(child)
 
-	def printTermNodes(self,node,terminal_nodes=[]):
+	def list_term_nodes(self,node,terminal_nodes=[]):
 		"""
 		A method of a Tree object that will print out the node instances for all tips in a list. 
 		"""
@@ -87,10 +87,23 @@ class Tree:
 		else:
 			for child in node.children:
 				print(terminal_nodes)
-				self.printTermNodes(child,terminal_nodes)
+				self.list_term_nodes(child,terminal_nodes)
 		return terminal_nodes
 
-	def treeLength(self,node):
+	def inv_edge_len(self,node,edge=0):
+		"""
+		A method of a Tree object that will return the total length from given node to root. 
+		"""
+		#at root return total
+		if node.brl == 0:
+			return edge 
+		else:
+			#add branch length
+			edge += 1/float(node.brl)
+			new_node = node.parent
+			return self.inv_edge_len(new_node,edge)
+
+	def tree_len(self,node):
 		"""
 		A method to calculate and return total tree length.
 		"""
@@ -101,10 +114,10 @@ class Tree:
 		else:
 			tot_len += node.brl #Add length of internal branch
 			for child in node.children:
-				tot_len += self.treeLength(child) #Add length of terminal branch
+				tot_len += self.tree_len(child) #Add length of terminal branch
 			return tot_len
 
-	def inverseTreeLength(self,node):
+	def inv_tree_len(self,node):
 		"""
 		A method to calculate and return inverse of total tree length.
 		"""
@@ -117,12 +130,12 @@ class Tree:
 			if node.brl == 0: #otherwise we get an error for root
 				inv_tot_len += 0
 				for child in node.children:
-					inv_tot_len += self.inverseTreeLength(child)
+					inv_tot_len += self.inv_tree_len(child)
 				return inv_tot_len
 			else:
 				inv_tot_len += 1/float(node.brl) #Add length of internal branch
 				for child in node.children:
-					inv_tot_len += self.inverseTreeLength(child) #Add length of terminal branch
+					inv_tot_len += self.inv_tree_len(child) #Add length of terminal branch
 				return inv_tot_len
 
 	def newick(self,node):
