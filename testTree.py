@@ -49,14 +49,11 @@ def where_my_child(parent):
 		children.append(child)
 	return children
 
-def pick_tip(tree):
-	#start with root unless you are starting at a specified internal node
-	if n == 0:
-		n=tree.root
-	#if you arent at a tip. pick a child 
-	while n.children !=[]:
-		n = where_my_child(n)[random.choice([0,1])]
-	return n
+def random_tip(tree, tip_list):
+	### make into choose random tip funciton
+	#tip_list = tree.list_term_nodes(tree.root) #add this back after debugging list_term_nodes
+	random_tip = random.choice(tip_list)
+	return random_tip
 
 
 #pick a random goal to start NNI from.	
@@ -66,10 +63,11 @@ def pick_goal(tree, tip_list):
 	edge_list = []
 	# get list of all tip to root edges
 	for node in tip_list:
-		edge_list.append(tree.edge_length(node))
+		edge_list.append(tree.inv_edge_len(node))
 	long_edge = max(edge_list)
 	#calculate goal, random number between 0 and longest edge.
 	g = random.uniform(0,long_edge)
+	print("max length: "+str(long_edge))
 	print("goal: "+str(g))
 	return g
 
@@ -81,9 +79,9 @@ def traverse_nodes(node,goal):
 		return node.brl
 	else:
 		#get inverse of branch length add back in after rewriting br macx function to be inverse
-		#inv_br=1/float(node.brl)
+		inv_br=1/float(node.brl)
 		#subtract from goal
-		goal -= node.brl
+		goal -= inv_br
 		#print("new goal:"+str(goal))
 		#if goal is less than zero, return p as node you will start NNI with. 
 		if goal <= 0:
@@ -98,21 +96,16 @@ def traverse_nodes(node,goal):
 
 
 # pick random tip in tree. traverse backwards to goal. or start function over
-def pick_start(tree, goal):
+def pick_start(tree, goal, tip_list):
 	#set root as start node
-	n = tree.root
-	#if not at tip, traverse until you hit a tip
-	while n.children !=[]:
-		n = where_my_child(n)[random.choice([0,1])]
-		print("where kids: "+str(n.name))
-	print("n: "+str(n.name))
+	n = random_tip(tree, tip_list)
 	#begin at tip and stop at goal or root
 	start = traverse_nodes(n,goal)
 	#if you get to the root, recursion
 	while start == 0:
 		#recursive
 		print("hit root -> recursion")
-		return pick_start(tree,goal)
+		return pick_start(tree,goal,tip_list)
 	print("start: "+str(start.name))
 	return start
 
@@ -121,34 +114,11 @@ def pick_start(tree, goal):
 doo="(P:9,(Q:7,(X:2,((Y:3,Z:1):2,W:8):6):3):4)"
 Jim = Tree(doo)
 #Tim_tips = Tim.printTermNodes(Tim.root)
-g = pick_goal(Jim,Jim_tips)
-x = pick_start(Jim,g)
-#tests
-x=Jim_tips[0]
-x.name
-y=Jim_tips[1]
-y.name
-Tim.edge_length(x)
+g = pick_goal(Jim,tip_list) #Z to root is longest
+x = pick_start(Jim,g,tip_list)
 
-### make into choose random tip funciton
-tip_list = Jim.list_term_nodes(Jim.root)
-random_tip = random.choice(tip_list)
+# write a stopper to not use 
 
-
-
-#import data and instantiate tree
-
-goo="(X:2,((Y:3,Z:1):2,W:8):6)"
-Tim = Tree(goo)
-#Tim_tips = Tim.printTermNodes(Tim.root)
-g = pick_goal(Tim,Tim_tips)
-x = pick_start(Tim,g)
-#tests
-x=Tim_tips[0]
-x.name
-y=Tim_tips[1].
-y.name
-Tim.edge_length(x)
 
 
 

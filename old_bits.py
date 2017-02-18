@@ -1,3 +1,22 @@
+
+--------Fake Data-----------------------------------------------------------
+#import data and instantiate tree
+
+goo="(X:2,((Y:3,Z:1):2,W:8):6)"
+Tim = Tree(goo)
+#Tim_tips = Tim.printTermNodes(Tim.root)
+g = pick_goal(Tim,Tim_tips)
+x = pick_start(Tim,g)
+#tests
+x=Tim_tips[0]
+x.name
+y=Tim_tips[1].
+y.name
+Tim.edge_length(x)
+
+-----------------------------------------------------------
+
+
 # pick random tip in tree. traverse backwards to goal. or start
 def pick_start(tree, goal, n=tree.root):
 	#set root as start node
