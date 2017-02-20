@@ -133,4 +133,27 @@ class Tree:
 				newick += ")"
 			return newick
 
-#random
+	def node_dict(self,node,newdict={}):
+		"""
+		Returns dictionary with all nodes and branch lengths
+		"""
+		if node.children == []: #Terminal branch returns branch length
+			newdict[node]=node.brl
+			return newdict
+		else:
+			newdict[node]=node.brl #Add length of internal branch
+			for child in node.children:
+				self.node_dict(child) #Add length of terminal branch
+			return newdict
+			
+data = "(A:3,((B:1,C:1):1,D:2):1)"
+Sim = Tree(data)
+dict = Sim.node_dict(Sim.root)
+randomval = min(list(dict.values()))
+print(randomval)
+somevalue = []
+for key, value in dict.items():
+	if value == randomval:
+		somevalue.append(key)
+print(somevalue)
+print(somevalue[0].children)
