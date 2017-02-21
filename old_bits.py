@@ -220,3 +220,102 @@ def traverse_nodes(node,goal):
 			p = node.parent
 			#print("new parent: "+str(p.name))
 			return traverse_nodes(p,goal)
+
+
+def pick_start(tree, goal):
+	#set root as start node
+	n = random_tip(tree, tip_list)
+	#begin at tip and stop at goal or root
+	node1 = traverse_nodes(n,goal)
+	start = node1.parent
+	#if you get to the root, recursion
+	if start == 0:
+		print("hit root -> recursion")
+		return pick_start(tree,goal,tip_list)
+	#if start is a tip node, recursion
+	elif start.children == [] :
+		print("tip node -> recursion")
+		return pick_start(tree,goal,tip_list)
+	#if start is node to sister tips, recursion
+	elif start.children[0].children == [] and start.children[1].children == []:
+		print("node to sisters -> recursion")
+		return pick_start(tree,goal,tip_list)
+	else:
+		print("start: "+str(start.name))
+		return start
+
+
+
+
+
+
+def pick_start_node(tree):
+	n_dict = tree.node_dict(tree.root)
+	#get goal chosen from exp distribution
+	goal = numpy.random.exponential(0.1)
+	#get node closest to goal, coming from zero towards goal
+	start_brl = max(brl for brl in list(n_dict.values()) if brl < goal)#could also come from above, or choose randomly to come from above or below. 
+	for key, value in n_dict.items():
+		if value == start_brl:
+				start_node = key
+	return start_node
+
+def pickier_start_node(tree):
+	#get dictionary of nodes,branchlen as key,value
+	start_node = tree.root
+	#if goal is between 0 and shortest branch, or returns a tip node
+	while start_node.brl == 0 or start_node.children == []:
+		start_node = pick_start_node(tree)
+	#if returns a node to sister tips, redo
+	if start_node.parent.brl == 0:
+		start_node = pickier_start_node(tree)
+	return start_node  
+
+#currently node names will still reflet the original children, not the new ones. this might actually be useful in racking what has happened. 
+
+def NNI(tree):
+	'''
+	Does NNI move on random branch, preferentially choosing smaller branches. Returns altered tree. 
+	'''
+	#reassign start node to c2. assign as c2
+	c2 = pickier_start_node(tree)
+	p = c2.parent
+	print("c2 = "+str(c2.name))
+	print("p = "+str(p.name))
+	#assign other child to c1
+	for c in p.children:
+			if c != c2:
+				c1 = c
+	#c2 will be the node for the brl we choose, so it will always have children. c1 is the other child for the parent/start node
+	#store branchlengths 
+	br1 = c1.brl
+	br2 = c2.brl
+	#we don't technically need to store these because they are all still attached to c2, but doing it for clarity for now.
+	gc1 = c2.children[0]
+	gc2 = c2.children[1]
+	br3 = gc1.brl
+	br4 = gc2.brl
+	#remove all children
+	p.children = []
+	name = "new_"+str(c2.name)
+	#this is the node to attach things to
+	new_node = Node(name,parent=p)
+	#give it branchlength of c2, then start adding branches
+	new_node.brl = br2
+	#add new node to parent
+	p.children.append(new_node)
+	#add c1 to new node
+	new_node.children.append(c1)
+	#add grandkids, one to parent, one to new node. randomly. 
+	adopt=random.choice([1,2])
+	if adopt == 1:
+		p.children.append(gc1)
+		new_node.children.append(gc2)
+	elif adopt ==2:
+		p.children.append(gc2)
+		new_node.children.append(gc1)
+	#name=tree.newick(new_node)
+	#new_node = can I rename node? this would keep with node naming scheme
+	return tree
+
+
