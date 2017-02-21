@@ -33,7 +33,11 @@ class Tree:
 		"""variable stores object called root that is classified as a node"""
 		self.root = Node("root") #Define root
 		"""Initiate with self.root as base. First step is initiating data with root as parent of ALL"""
+<<<<<<< HEAD
+		self.newicksplicer(data.strip(";"), self.root)
+=======
 		self.newick_splicer(data.strip(";"), self.root)
+>>>>>>> upstream/master
 
 	def newick_splicer(self, data, parent):
 		"""
