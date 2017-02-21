@@ -34,7 +34,7 @@ class Tree:
 		"""variable stores object called root that is classified as a node"""
 		self.root = Node("root") #Define root
 		"""Initiate with self.root as base. First step is initiating data with root as parent of ALL"""
-		self.newicksplicer(data, self.root)
+		self.newicksplicer(data.strip(";"), self.root)
 
 	def newicksplicer(self, data, parent):
 		"""
@@ -52,7 +52,7 @@ class Tree:
 					if n == 0: #To check for correct comma
 						vals = (data[0:key], data[key+1:len(data)-1]) #Break newick into left and right datasets
 						for unit in vals: #For each entry of dataset
-							if unit[-1] != ")": #For cases with branch lengths
+							if unit.find(":") != -1: #For cases with branch lengths
 								d = unit[0:unit.rfind(":")] #get rid of trailing branchlength if provided. rfind from the right side
 								node_creater = Node(d, parent = parent) #Create node entry
 								node_creater.brl = float(unit[unit.rfind(":")+1:]) #Append branch length of that branch
