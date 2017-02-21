@@ -76,7 +76,7 @@ class Tree:
 		else:
 			for child in node.children:
 				self.print_names(child)
-
+	'''
 	def list_term_nodes(self,node,terminal_nodes=[]):
 		"""
 		A method of a Tree object that will print out the node instances for all tips in a list. 
@@ -89,7 +89,7 @@ class Tree:
 				print(terminal_nodes)
 				self.list_term_nodes(child,terminal_nodes)
 		return terminal_nodes
-
+	'''
 	def inv_edge_len(self,node,edge=0):
 		"""
 		A method of a Tree object that will return the total length from given node to root. 
@@ -159,4 +159,35 @@ class Tree:
 				newick += ")"
 			return newick
 
+	def has_grandkids(self,node):
+		"""
+		Takes a node and will randomy choose a child and return the child node if it has grandchildren
+		could add an argument to determine if the child is chosen randomly or based on branch length of children. (for passing shorter branches to NNI moves more often).
+		"""
+		#if node has children
+		if node.children != []:
+			#pick random child
+			kid = node.children[random.choice([0,1])]
+			#if child has children, return grandchildren of node
+			if kid.children != []:
+				return kid
+			else:
+				return self.has_grandkids(node)
+		#if node doesnt have children, you are at a tip
+		else:
+			return 0
+
+	def node_dict(self,node,nodedict={}):
+ 		"""
+ 		Returns dictionary with all nodes and branch lengths
+ 		"""
+ 		if node.children == []: #Terminal branch returns branch length
+ 			nodedict[node]=node.brl
+ 			return nodedict
+ 		else:
+ 			nodedict[node]=node.brl #Add length of internal branch
+ 			for child in node.children:
+ 				self.node_dict(child) #Add length of terminal branch
+ 			return nodedict
+ 			
 
